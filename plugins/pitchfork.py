@@ -17,23 +17,31 @@ class Pitchfork(BotPlugin):
         """
         match = re.match(r'@?([\w-]+)(?:\s+(?:down\s+)?to\s+(.+))?$',
                          arg)
+        GH_ORG_NAME = self.get_plugin('LabHub').GH_ORG_NAME
+        teams = self.get_plugin('LabHub').TEAMS()
+        issuer = msg.frm.nick
         if match:
-            user = match.group(1)
-            place = match.group(2) if match.group(2) else 'offtopic'
-            return textwrap.dedent((
-                string.Template("""
-                    @$user, you are being pitchforked down to $place
-                    ```
-                                                          .+====----->
-                                                           \('
-                    =====================================<%{%{%{>>+===---> $user
-                                                           /(,
-                                                          .+====----->
-                    ```
-                """).substitute(user=user,
-                                place=('[offtopic]('
-                                       'https://gitter.im/coala/coala/offtopic)'
-                                       if place == 'offtopic' else place))
-                ))
+            if teams[GH_ORG_NAME + ' developers'].is_member(issuer):
+                user = match.group(1)
+                place = match.group(2) if match.group(2) else 'offtopic'
+                return textwrap.dedent((
+                    string.Template("""
+                        @$user, you are being pitchforked down to $place
+                        ```
+                                                              .+====----->
+                                                               \('
+                        ================================<%{%{%{>>+===---> $user
+                                                               /(,
+                                                              .+====----->
+                        ```
+                    """).substitute(user=user,
+                                    place=('[offtopic]('
+                                           'https://gitter.im/coala/'
+                                           'coala/offtopic)'
+                                           if place == 'offtopic' else place))
+                    ))
+            else:
+                return ('@{}, you are not a developer, only developers can'
+                        ' invite other people. Nice try :poop:'.format(issuer))
         else:
             return "Usage: `pitchfork user [[down] to place]`"

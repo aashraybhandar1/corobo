@@ -1,6 +1,7 @@
 [Core]
 name = pitchfork
 module = pitchfork
+DependsOn = LabHub
 
 [Documentation]
 description = To pitchfork users down to ...
